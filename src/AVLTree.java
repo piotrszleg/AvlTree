@@ -1,5 +1,3 @@
-import java.util.Collection;
-
 class AVLTree<T extends Comparable<T>> {
 
     private class Node {
@@ -130,7 +128,7 @@ class AVLTree<T extends Comparable<T>> {
         else if (key.compareTo(node.key)>0)
             node.right = insert(node.right, key);
         else // Duplicate keys not allowed 
-            throw new RuntimeException("Duplicate key");// TOFIX
+            throw new RuntimeException("Duplicate key");
 
         /* 2. Update height of this ancestor node */
         node.height = 1 + Math.max(height(node.left),
@@ -310,7 +308,7 @@ class AVLTree<T extends Comparable<T>> {
         return containsRecursive(root, element);
     }
 
-    private void inOrderRecursive(Node node, Visitor visitor) {
+    private void inOrderRecursive(Node node, Visitor<T> visitor) {
         if (node != null) {
             inOrderRecursive(node.left, visitor);
             visitor.visit(node.key);
@@ -318,7 +316,7 @@ class AVLTree<T extends Comparable<T>> {
         }
     }
 
-    private void preOrderRecursive(Node node, Visitor visitor) {
+    private void preOrderRecursive(Node node, Visitor<T> visitor) {
         if (node != null) {
             visitor.visit(node.key);
             preOrderRecursive(node.left, visitor);
@@ -326,7 +324,7 @@ class AVLTree<T extends Comparable<T>> {
         }
     }
 
-    private void postOrderRecursive(Node node, Visitor visitor) {
+    private void postOrderRecursive(Node node, Visitor<T> visitor) {
         if (node != null) {
             postOrderRecursive(node.left, visitor);
             postOrderRecursive(node.right, visitor);
@@ -334,13 +332,13 @@ class AVLTree<T extends Comparable<T>> {
         }
     }
 
-    public enum VisitionOrder {
+    public enum VisitingOrder {
         IN_ORDER,
         PRE_ORDER,
         POST_ORDER,
     }
 
-    public void visit(Visitor visitor, VisitionOrder order) {
+    public void visit(Visitor<T> visitor, VisitingOrder order) {
         switch (order) {
             case IN_ORDER:
                 inOrderRecursive(root, visitor);

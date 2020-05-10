@@ -13,7 +13,7 @@ class AVLTreeTest {
         assertTrue(tree.contains(2));
     }
 
-    AVLTree<Integer> test_tree=new AVLTree<>(new Integer[]{10, 6, 20, 3, 4});
+    final AVLTree<Integer> test_tree=new AVLTree<>(new Integer[]{10, 6, 20, 3, 4});
 
     @org.junit.jupiter.api.Test
     void lower() {
@@ -37,7 +37,7 @@ class AVLTreeTest {
     abstract class TestVisitor<T extends Comparable<T>> implements AVLTree.Visitor<T> {
         boolean hasPrevious=false;
         T previous;
-        AVLTree<T> visited=new AVLTree<>();
+        final AVLTree<T> visited=new AVLTree<>();
         abstract void assertion(T previous, T current);
         public void visit(T element){
             if(hasPrevious) {
@@ -51,11 +51,11 @@ class AVLTreeTest {
 
     @org.junit.jupiter.api.Test
     void inOrderVisit() {
-        test_tree.visit(new TestVisitor() {
+        test_tree.visit(new TestVisitor<>() {
             @Override
-            void assertion(Comparable previous, Comparable current) {
+            void assertion(Integer previous, Integer current) {
                 assertTrue(previous.compareTo(current)<=0);
             }
-        }, AVLTree.VisitionOrder.IN_ORDER);
+        }, AVLTree.VisitingOrder.IN_ORDER);
     }
 }
