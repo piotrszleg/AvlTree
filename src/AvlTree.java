@@ -3,22 +3,22 @@ import java.util.Arrays;
 class AvlTree<T extends Comparable<T>> {
 
     private class Node {
-        private T key;
+        private T value;
         private int height;
         private Node left;
         private Node right;
 
         Node(T d) {
-            setKey(d);
+            setValue(d);
             setHeight(1);
         }
 
-        public T getKey() {
-            return key;
+        public T getValue() {
+            return value;
         }
 
-        public void setKey(T key) {
-            this.key = key;
+        public void setValue(T value) {
+            this.value = value;
         }
 
         public int getHeight() {
@@ -62,8 +62,10 @@ class AvlTree<T extends Comparable<T>> {
         }
     }
 
+    // number of spaces that need to be placed before element at depth n
+    // in order for the graph to have a correct shape
     // a(0)=0, a(n)=a(n-1)*2+1 in iterative form
-    public int spaces(int n){
+    public int spacesCount(int n){
         return (int)Math.pow(2, n)-1;
     }
 
@@ -75,14 +77,14 @@ class AvlTree<T extends Comparable<T>> {
 
     private String graphRecursive(Node node){
         if(node!=null){
-            return node.getKey().toString();
+            return node.getValue().toString();
         } else {
             return " ";
         }
     }
 
     private void graphRecursive(Node node, String[] lines, int depth){
-        String space=repeatCharacter(' ', spaces(root.getHeight() -depth));
+        String space=repeatCharacter(' ', spacesCount(root.getHeight() -depth));
         if(lines[depth]==null){
             lines[depth]=space+graphRecursive(node);
         } else {
@@ -156,11 +158,11 @@ class AvlTree<T extends Comparable<T>> {
     }
 
     // Get Balance factor of node N 
-    private int getBalance(Node N) {
-        if (N == null)
+    private int getBalance(Node node) {
+        if (node == null)
             return 0;
 
-        return height(N.getLeft()) - height(N.getRight());
+        return height(node.getLeft()) - height(node.getRight());
     }
 
     private boolean isAvlBalancedRecursive(Node node){
@@ -184,21 +186,21 @@ class AvlTree<T extends Comparable<T>> {
         int balance = getBalance(node);
 
         // left-left case
-        if (balance > 1 && key.compareTo(node.getLeft().getKey())<0)
+        if (balance > 1 && key.compareTo(node.getLeft().getValue())<0)
             return rightRotate(node);
 
         // right-right case
-        if (balance < -1 && key.compareTo(node.getRight().getKey())>0)
+        if (balance < -1 && key.compareTo(node.getRight().getValue())>0)
             return leftRotate(node);
 
         // left-right case
-        if (balance > 1 && key.compareTo(node.getLeft().getKey())>0) {
+        if (balance > 1 && key.compareTo(node.getLeft().getValue())>0) {
             node.setLeft(leftRotate(node.getLeft()));
             return rightRotate(node);
         }
 
         // right-left case
-        if (balance < -1 && key.compareTo(node.getRight().getKey())<0) {
+        if (balance < -1 && key.compareTo(node.getRight().getValue())<0) {
             node.setRight(rightRotate(node.getRight()));
             return leftRotate(node);
         }
@@ -210,9 +212,9 @@ class AvlTree<T extends Comparable<T>> {
         if (node == null)
             return new Node(key);
 
-        if (key.compareTo(node.getKey())<0) {
+        if (key.compareTo(node.getValue())<0) {
             node.setLeft(insert(node.getLeft(), key));
-        } else if (key.compareTo(node.getKey())>0) {
+        } else if (key.compareTo(node.getValue())>0) {
             node.setRight(insert(node.getRight(), key));
         } else {
             // Replace already existing node
@@ -243,7 +245,7 @@ class AvlTree<T extends Comparable<T>> {
     }
 
     public T lower(){
-        return lowerNode(root).getKey();
+        return lowerNode(root).getValue();
     }
 
     private Node upperNode(Node node)
@@ -259,7 +261,7 @@ class AvlTree<T extends Comparable<T>> {
     }
 
     public T upper(){
-        return upperNode(root).getKey();
+        return upperNode(root).getValue();
     }
 
     private Node fixAfterDeletion(Node node){
@@ -297,10 +299,10 @@ class AvlTree<T extends Comparable<T>> {
             return null;
         }
 
-        if (key.compareTo(node.getKey())<0) {
+        if (key.compareTo(node.getValue())<0) {
             // search left subtree
             node.setLeft(deleteNode(node.getLeft(), key));
-        } else if (key.compareTo(node.getKey())>0) {
+        } else if (key.compareTo(node.getValue())>0) {
             // search right subtree
             node.setRight(deleteNode(node.getRight(), key));
         } else {
@@ -329,9 +331,9 @@ class AvlTree<T extends Comparable<T>> {
                 // get the lowest node in the right subtree
                 Node lowest = lowerNode(node.getRight());
                 // replace node value with the lowest value
-                node.setKey(lowest.getKey());
+                node.setValue(lowest.getValue());
                 // delete the lowest in right subtree using this function recursively
-                node.setRight(deleteNode(node.getRight(), lowest.getKey()));
+                node.setRight(deleteNode(node.getRight(), lowest.getValue()));
             }
         }
 
@@ -346,7 +348,7 @@ class AvlTree<T extends Comparable<T>> {
     private boolean containsRecursive(Node node, T element){
         if(node==null){
             return false;
-        } else if(node.getKey().equals(element)){
+        } else if(node.getValue().equals(element)){
             return true;
         } else {
             return containsRecursive(node.getLeft(), element)
@@ -377,14 +379,14 @@ class AvlTree<T extends Comparable<T>> {
     private void inOrderRecursive(Node node, Visitor<T> visitor) {
         if (node != null) {
             inOrderRecursive(node.getLeft(), visitor);
-            visitor.visit(node.getKey());
+            visitor.visit(node.getValue());
             inOrderRecursive(node.getRight(), visitor);
         }
     }
 
     private void preOrderRecursive(Node node, Visitor<T> visitor) {
         if (node != null) {
-            visitor.visit(node.getKey());
+            visitor.visit(node.getValue());
             preOrderRecursive(node.getLeft(), visitor);
             preOrderRecursive(node.getRight(), visitor);
         }
@@ -394,7 +396,7 @@ class AvlTree<T extends Comparable<T>> {
         if (node != null) {
             postOrderRecursive(node.getLeft(), visitor);
             postOrderRecursive(node.getRight(), visitor);
-            visitor.visit(node.getKey());
+            visitor.visit(node.getValue());
         }
     }
 
