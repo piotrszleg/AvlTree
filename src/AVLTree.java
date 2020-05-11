@@ -104,7 +104,7 @@ class AVLTree<T extends Comparable<T>> {
         if(node==null){
             return 0;
         } else {
-            return sizeRecursive(node.getLeft())+sizeRecursive(node.getRight());
+            return 1+sizeRecursive(node.getLeft())+sizeRecursive(node.getRight());
         }
     }
 
@@ -387,7 +387,7 @@ class AVLTree<T extends Comparable<T>> {
         POST_ORDER,
     }
 
-    public void visit(Visitor<T> visitor, VisitingOrder order) {
+    public void accept(Visitor<T> visitor, VisitingOrder order) {
         switch (order) {
             case IN_ORDER:
                 inOrderRecursive(root, visitor);

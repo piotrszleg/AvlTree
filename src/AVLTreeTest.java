@@ -51,8 +51,10 @@ class AVLTreeTest {
         tree.insert(5);
         tree.insert(5);
         assertTrue(tree.contains(5));
+        assertEquals(1, tree.size());
         tree.delete(5);
         assertFalse(tree.contains(5));
+        assertEquals(0, tree.size());
     }
 
     @org.junit.jupiter.api.Test
@@ -63,6 +65,7 @@ class AVLTreeTest {
         tree.delete(5);
         tree.delete(5);
         assertFalse(tree.contains(5));
+        assertEquals(0, tree.size());
     }
 
     interface OrderAssertion<T> {
@@ -93,7 +96,7 @@ class AVLTreeTest {
             hasPrevious=true;
         }
         void run(){
-            tested.visit(this, order);
+            tested.accept(this, order);
             // set can only contain one instance of each element
             // so if visited has same size as tested all the visitor visited all the elements
             // first line of visit guarantees that visited won't contain elements that aren't in tested
