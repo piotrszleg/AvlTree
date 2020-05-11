@@ -163,6 +163,23 @@ class AVLTree<T extends Comparable<T>> {
         return height(N.getLeft()) - height(N.getRight());
     }
 
+    private boolean isCorrectAVLRecursive(Node node){
+        if(node!=null){
+            if(Math.abs(getBalance(node))>1){
+                return false;
+            } else {
+                return isCorrectAVLRecursive(node.left)
+                        && isCorrectAVLRecursive(node.right);
+            }
+        } else {
+            return true;
+        }
+    }
+
+    boolean isCorrectAVL(){
+        return isCorrectAVLRecursive(root);
+    }
+
     private Node fixAfterInsertion(Node node, T key){
         int balance = getBalance(node);
 
@@ -193,16 +210,16 @@ class AVLTree<T extends Comparable<T>> {
         if (node == null)
             return new Node(key);
 
-        if (key.compareTo(node.getKey())<0)
+        if (key.compareTo(node.getKey())<0) {
             node.setLeft(insert(node.getLeft(), key));
-        else if (key.compareTo(node.getKey())>0)
+        } else if (key.compareTo(node.getKey())>0) {
             node.setRight(insert(node.getRight(), key));
-        else {
+        } else {
             // Replace already existing node
             Node newNode = new Node(key);
             newNode.setRight(node.getRight());
             newNode.setLeft(node.getLeft());
-            return newNode;
+            node=newNode;
         }
 
         updateHeight(node);

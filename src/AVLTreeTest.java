@@ -13,6 +13,7 @@ class AVLTreeTest {
         assertTrue(tree.contains(1));
         assertTrue(tree.contains(5));
         assertTrue(tree.contains(2));
+        assertTrue(tree.isCorrectAVL());
     }
 
     final AVLTree<Integer> test_tree=new AVLTree<>(new Integer[]{10, 6, 20, 3, 4});
@@ -28,12 +29,18 @@ class AVLTreeTest {
     }
 
     @org.junit.jupiter.api.Test
+    void size() {
+        assertEquals( test_tree.size(), 5);
+    }
+
+    @org.junit.jupiter.api.Test
     void delete() {
         AVLTree<Integer> tree=new AVLTree<>(new Integer[]{10, 6, 20, 3, 4});
         tree.delete(4);
         assertFalse(tree.contains(4));
         tree.delete(6);
         assertFalse(tree.contains(6));
+        assertTrue(tree.isCorrectAVL());
     }
 
     @org.junit.jupiter.api.Test
@@ -43,6 +50,7 @@ class AVLTreeTest {
         assertFalse(tree.contains(4));
         tree.delete(6);
         assertFalse(tree.contains(6));
+        assertTrue(tree.isCorrectAVL());
     }
 
     @org.junit.jupiter.api.Test
@@ -55,6 +63,7 @@ class AVLTreeTest {
         tree.delete(5);
         assertFalse(tree.contains(5));
         assertEquals(0, tree.size());
+        assertTrue(tree.isCorrectAVL());
     }
 
     @org.junit.jupiter.api.Test
@@ -66,6 +75,7 @@ class AVLTreeTest {
         tree.delete(5);
         assertFalse(tree.contains(5));
         assertEquals(0, tree.size());
+        assertTrue(tree.isCorrectAVL());
     }
 
     interface OrderAssertion<T> {
@@ -150,6 +160,7 @@ class AVLTreeTest {
                 tree.delete(element);
                 assertFalse(tree.contains(element));
             }
+            assertTrue(tree.isCorrectAVL());
         }
     }
 }
