@@ -3,14 +3,46 @@ import java.util.Arrays;
 class AVLTree<T extends Comparable<T>> {
 
     private class Node {
-        T key;
-        int height;
-        Node left;
-        Node right;
+        private T key;
+        private int height;
+        private Node left;
+        private Node right;
 
         Node(T d) {
-            key = d;
-            height = 1;
+            setKey(d);
+            setHeight(1);
+        }
+
+        public T getKey() {
+            return key;
+        }
+
+        public void setKey(T key) {
+            this.key = key;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public void setHeight(int height) {
+            this.height = height;
+        }
+
+        public Node getLeft() {
+            return left;
+        }
+
+        public void setLeft(Node left) {
+            this.left = left;
+        }
+
+        public Node getRight() {
+            return right;
+        }
+
+        public void setRight(Node right) {
+            this.right = right;
         }
     }
 
@@ -43,27 +75,27 @@ class AVLTree<T extends Comparable<T>> {
 
     private String graphRecursive(Node node){
         if(node!=null){
-            return node.key.toString();
+            return node.getKey().toString();
         } else {
             return " ";
         }
     }
 
     private void graphRecursive(Node node, String[] lines, int depth){
-        String space=repeatCharacter(' ', spaces(root.height-depth));
+        String space=repeatCharacter(' ', spaces(root.getHeight() -depth));
         if(lines[depth]==null){
             lines[depth]=space+graphRecursive(node);
         } else {
             lines[depth]+=space+" "+space+graphRecursive(node);
         }
         if(node!=null) {
-            graphRecursive(node.left, lines, depth + 1);
-            graphRecursive(node.right, lines, depth + 1);
+            graphRecursive(node.getLeft(), lines, depth + 1);
+            graphRecursive(node.getRight(), lines, depth + 1);
         }
     }
 
     public String graph() {
-        String[] lines=new String[root.height+1];
+        String[] lines=new String[root.getHeight() +1];
         graphRecursive(root, lines, 0);
         return String.join("\n", lines);
     }
@@ -72,7 +104,7 @@ class AVLTree<T extends Comparable<T>> {
         if(node==null){
             return 0;
         } else {
-            return sizeRecursive(node.left)+sizeRecursive(node.right);
+            return sizeRecursive(node.getLeft())+sizeRecursive(node.getRight());
         }
     }
 
@@ -84,20 +116,20 @@ class AVLTree<T extends Comparable<T>> {
         if (N == null)
             return 0;
 
-        return N.height;
+        return N.getHeight();
     }
 
     private void updateHeight(Node node){
-        node.height=Math.max(height(node.left), height(node.right)) + 1;
+        node.setHeight(Math.max(height(node.getLeft()), height(node.getRight())) + 1);
     }
 
     private Node rightRotate(Node y) {
-        Node x = y.left;
-        Node T2 = x.right;
+        Node x = y.getLeft();
+        Node T2 = x.getRight();
 
         // Perform rotation 
-        x.right = y;
-        y.left = T2;
+        x.setRight(y);
+        y.setLeft(T2);
 
         // Update heights
         updateHeight(y);
@@ -108,16 +140,16 @@ class AVLTree<T extends Comparable<T>> {
     }
 
     private Node leftRotate(Node x) {
-        Node y = x.right;
-        Node T2 = y.left;
+        Node y = x.getRight();
+        Node T2 = y.getLeft();
 
         // Perform rotation 
-        y.left = x;
-        x.right = T2;
+        y.setLeft(x);
+        x.setRight(T2);
 
         //  Update heights 
-        x.height = Math.max(height(x.left), height(x.right)) + 1;
-        y.height = Math.max(height(y.left), height(y.right)) + 1;
+        x.setHeight(Math.max(height(x.getLeft()), height(x.getRight())) + 1);
+        y.setHeight(Math.max(height(y.getLeft()), height(y.getRight())) + 1);
 
         // Return new root 
         return y;
@@ -128,29 +160,29 @@ class AVLTree<T extends Comparable<T>> {
         if (N == null)
             return 0;
 
-        return height(N.left) - height(N.right);
+        return height(N.getLeft()) - height(N.getRight());
     }
 
     private Node fixAfterInsertion(Node node, T key){
         int balance = getBalance(node);
 
         // left-left case
-        if (balance > 1 && key.compareTo(node.left.key)<0)
+        if (balance > 1 && key.compareTo(node.getLeft().getKey())<0)
             return rightRotate(node);
 
         // right-right case
-        if (balance < -1 && key.compareTo(node.right.key)>0)
+        if (balance < -1 && key.compareTo(node.getRight().getKey())>0)
             return leftRotate(node);
 
         // left-right case
-        if (balance > 1 && key.compareTo(node.left.key)>0) {
-            node.left = leftRotate(node.left);
+        if (balance > 1 && key.compareTo(node.getLeft().getKey())>0) {
+            node.setLeft(leftRotate(node.getLeft()));
             return rightRotate(node);
         }
 
         // right-left case
-        if (balance < -1 && key.compareTo(node.right.key)<0) {
-            node.right = rightRotate(node.right);
+        if (balance < -1 && key.compareTo(node.getRight().getKey())<0) {
+            node.setRight(rightRotate(node.getRight()));
             return leftRotate(node);
         }
 
@@ -161,15 +193,15 @@ class AVLTree<T extends Comparable<T>> {
         if (node == null)
             return new Node(key);
 
-        if (key.compareTo(node.key)<0)
-            node.left = insert(node.left, key);
-        else if (key.compareTo(node.key)>0)
-            node.right = insert(node.right, key);
+        if (key.compareTo(node.getKey())<0)
+            node.setLeft(insert(node.getLeft(), key));
+        else if (key.compareTo(node.getKey())>0)
+            node.setRight(insert(node.getRight(), key));
         else {
             // Replace already existing node
             Node newNode = new Node(key);
-            newNode.right=node.right;
-            newNode.left=node.left;
+            newNode.setRight(node.getRight());
+            newNode.setLeft(node.getLeft());
             return newNode;
         }
 
@@ -186,15 +218,15 @@ class AVLTree<T extends Comparable<T>> {
         Node current = node;
 
         // find element the furthest left element in the tree
-        while (current.left != null) {
-            current = current.left;
+        while (current.getLeft() != null) {
+            current = current.getLeft();
         }
 
         return current;
     }
 
     public T lower(){
-        return lowerNode(root).key;
+        return lowerNode(root).getKey();
     }
 
     private Node upperNode(Node node)
@@ -202,40 +234,40 @@ class AVLTree<T extends Comparable<T>> {
         Node current = node;
 
         // find element the furthest right element in the tree
-        while (current.right != null) {
-            current = current.right;
+        while (current.getRight() != null) {
+            current = current.getRight();
         }
 
         return current;
     }
 
     public T upper(){
-        return upperNode(root).key;
+        return upperNode(root).getKey();
     }
 
     private Node fixAfterDeletion(Node node){
         int balance = getBalance(node);
 
         // left-left case
-        if (balance > 1 && getBalance(node.left) >= 0)
+        if (balance > 1 && getBalance(node.getLeft()) >= 0)
             return rightRotate(node);
 
         // left-right case
-        if (balance > 1 && getBalance(node.left) < 0)
+        if (balance > 1 && getBalance(node.getLeft()) < 0)
         {
-            node.left = leftRotate(node.left);
+            node.setLeft(leftRotate(node.getLeft()));
             return rightRotate(node);
         }
 
         // right-right case
-        if (balance < -1 && getBalance(node.right) <= 0) {
+        if (balance < -1 && getBalance(node.getRight()) <= 0) {
             return leftRotate(node);
         }
 
         // right-left case
-        if (balance < -1 && getBalance(node.right) > 0)
+        if (balance < -1 && getBalance(node.getRight()) > 0)
         {
-            node.right = rightRotate(node.right);
+            node.setRight(rightRotate(node.getRight()));
             return leftRotate(node);
         }
 
@@ -248,21 +280,21 @@ class AVLTree<T extends Comparable<T>> {
             return null;
         }
 
-        if (key.compareTo(node.key)<0) {
+        if (key.compareTo(node.getKey())<0) {
             // search left subtree
-            node.left = deleteNode(node.left, key);
-        } else if (key.compareTo(node.key)>0) {
+            node.setLeft(deleteNode(node.getLeft(), key));
+        } else if (key.compareTo(node.getKey())>0) {
             // search right subtree
-            node.right = deleteNode(node.right, key);
+            node.setRight(deleteNode(node.getRight(), key));
         } else {
             // node with only one child or no child
-            if ((node.left == null) || (node.right == null))
+            if ((node.getLeft() == null) || (node.getRight() == null))
             {
                 Node temp;
-                if (node.left!=null) {
-                    temp = node.left;
+                if (node.getLeft() !=null) {
+                    temp = node.getLeft();
                 } else {
-                    temp = node.right;
+                    temp = node.getRight();
                 }
 
                 // the node has no children
@@ -278,11 +310,11 @@ class AVLTree<T extends Comparable<T>> {
             else
             {
                 // get the lowest node in the right subtree
-                Node lowest = lowerNode(node.right);
+                Node lowest = lowerNode(node.getRight());
                 // replace node value with the lowest value
-                node.key = lowest.key;
+                node.setKey(lowest.getKey());
                 // delete the lowest in right subtree using this function recursively
-                node.right = deleteNode(node.right, lowest.key);
+                node.setRight(deleteNode(node.getRight(), lowest.getKey()));
             }
         }
 
@@ -297,11 +329,11 @@ class AVLTree<T extends Comparable<T>> {
     private boolean containsRecursive(Node node, T element){
         if(node==null){
             return false;
-        } else if(node.key.equals(element)){
+        } else if(node.getKey().equals(element)){
             return true;
         } else {
-            return containsRecursive(node.left, element)
-                    || containsRecursive(node.right, element);
+            return containsRecursive(node.getLeft(), element)
+                    || containsRecursive(node.getRight(), element);
         }
     }
 
@@ -313,11 +345,11 @@ class AVLTree<T extends Comparable<T>> {
         if(node==null){
             return -1;
         }
-        int onLeft=elementDepthRecursive(node.left, element);
+        int onLeft=elementDepthRecursive(node.getLeft(), element);
         if(onLeft!=-1){
             return onLeft;
         } else {
-            return elementDepthRecursive(node.right, element);
+            return elementDepthRecursive(node.getRight(), element);
         }
     }
 
@@ -327,25 +359,25 @@ class AVLTree<T extends Comparable<T>> {
 
     private void inOrderRecursive(Node node, Visitor<T> visitor) {
         if (node != null) {
-            inOrderRecursive(node.left, visitor);
-            visitor.visit(node.key);
-            inOrderRecursive(node.right, visitor);
+            inOrderRecursive(node.getLeft(), visitor);
+            visitor.visit(node.getKey());
+            inOrderRecursive(node.getRight(), visitor);
         }
     }
 
     private void preOrderRecursive(Node node, Visitor<T> visitor) {
         if (node != null) {
-            visitor.visit(node.key);
-            preOrderRecursive(node.left, visitor);
-            preOrderRecursive(node.right, visitor);
+            visitor.visit(node.getKey());
+            preOrderRecursive(node.getLeft(), visitor);
+            preOrderRecursive(node.getRight(), visitor);
         }
     }
 
     private void postOrderRecursive(Node node, Visitor<T> visitor) {
         if (node != null) {
-            postOrderRecursive(node.left, visitor);
-            postOrderRecursive(node.right, visitor);
-            visitor.visit(node.key);
+            postOrderRecursive(node.getLeft(), visitor);
+            postOrderRecursive(node.getRight(), visitor);
+            visitor.visit(node.getKey());
         }
     }
 
