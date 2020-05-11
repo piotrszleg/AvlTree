@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-class AVLTree<T extends Comparable<T>> {
+class AvlTree<T extends Comparable<T>> {
 
     private class Node {
         private T key;
@@ -52,11 +52,11 @@ class AVLTree<T extends Comparable<T>> {
 
     private Node root;
 
-    public AVLTree(){
+    public AvlTree(){
 
     }
 
-    public AVLTree(T[] array){
+    public AvlTree(T[] array){
         for(T element : array){
             insert(element);
         }
@@ -163,21 +163,21 @@ class AVLTree<T extends Comparable<T>> {
         return height(N.getLeft()) - height(N.getRight());
     }
 
-    private boolean isCorrectAVLRecursive(Node node){
+    private boolean isAvlBalancedRecursive(Node node){
         if(node!=null){
             if(Math.abs(getBalance(node))>1){
                 return false;
             } else {
-                return isCorrectAVLRecursive(node.left)
-                        && isCorrectAVLRecursive(node.right);
+                return isAvlBalancedRecursive(node.left)
+                        && isAvlBalancedRecursive(node.right);
             }
         } else {
             return true;
         }
     }
 
-    boolean isCorrectAVL(){
-        return isCorrectAVLRecursive(root);
+    boolean isAvlBalanced(){
+        return isAvlBalancedRecursive(root);
     }
 
     private Node fixAfterInsertion(Node node, T key){

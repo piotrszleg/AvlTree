@@ -2,21 +2,21 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AVLTreeTest {
+class AvlTreeTest {
 
     @org.junit.jupiter.api.Test
     void insert() {
-        AVLTree<Integer> tree=new AVLTree<>();
+        AvlTree<Integer> tree=new AvlTree<>();
         tree.insert(1);
         tree.insert(5);
         tree.insert(2);
         assertTrue(tree.contains(1));
         assertTrue(tree.contains(5));
         assertTrue(tree.contains(2));
-        assertTrue(tree.isCorrectAVL());
+        assertTrue(tree.isAvlBalanced());
     }
 
-    final AVLTree<Integer> test_tree=new AVLTree<>(new Integer[]{10, 6, 20, 3, 4});
+    final AvlTree<Integer> test_tree=new AvlTree<>(new Integer[]{10, 6, 20, 3, 4});
 
     @org.junit.jupiter.api.Test
     void lower() {
@@ -35,27 +35,27 @@ class AVLTreeTest {
 
     @org.junit.jupiter.api.Test
     void delete() {
-        AVLTree<Integer> tree=new AVLTree<>(new Integer[]{10, 6, 20, 3, 4});
+        AvlTree<Integer> tree=new AvlTree<>(new Integer[]{10, 6, 20, 3, 4});
         tree.delete(4);
         assertFalse(tree.contains(4));
         tree.delete(6);
         assertFalse(tree.contains(6));
-        assertTrue(tree.isCorrectAVL());
+        assertTrue(tree.isAvlBalanced());
     }
 
     @org.junit.jupiter.api.Test
     void deleteAll(){
-        AVLTree<Integer> tree=new AVLTree<>(new Integer[]{4, 6});
+        AvlTree<Integer> tree=new AvlTree<>(new Integer[]{4, 6});
         tree.delete(4);
         assertFalse(tree.contains(4));
         tree.delete(6);
         assertFalse(tree.contains(6));
-        assertTrue(tree.isCorrectAVL());
+        assertTrue(tree.isAvlBalanced());
     }
 
     @org.junit.jupiter.api.Test
     void doubleInsert(){
-        AVLTree<Integer> tree=new AVLTree<>();
+        AvlTree<Integer> tree=new AvlTree<>();
         tree.insert(5);
         tree.insert(5);
         assertTrue(tree.contains(5));
@@ -63,35 +63,35 @@ class AVLTreeTest {
         tree.delete(5);
         assertFalse(tree.contains(5));
         assertEquals(0, tree.size());
-        assertTrue(tree.isCorrectAVL());
+        assertTrue(tree.isAvlBalanced());
     }
 
     @org.junit.jupiter.api.Test
     void doubleDelete(){
-        AVLTree<Integer> tree=new AVLTree<>();
+        AvlTree<Integer> tree=new AvlTree<>();
         tree.insert(5);
         assertTrue(tree.contains(5));
         tree.delete(5);
         tree.delete(5);
         assertFalse(tree.contains(5));
         assertEquals(0, tree.size());
-        assertTrue(tree.isCorrectAVL());
+        assertTrue(tree.isAvlBalanced());
     }
 
     interface OrderAssertion<T> {
         void test(T previous, T current);
     }
 
-    static class TestVisitor<T extends Comparable<T>> implements AVLTree.Visitor<T> {
-        final AVLTree.VisitingOrder order;
+    static class TestVisitor<T extends Comparable<T>> implements AvlTree.Visitor<T> {
+        final AvlTree.VisitingOrder order;
         final OrderAssertion<T> orderAssertion;
-        final AVLTree<T> tested;
+        final AvlTree<T> tested;
 
-        final AVLTree<T> visited=new AVLTree<>();
+        final AvlTree<T> visited=new AvlTree<>();
         boolean hasPrevious=false;
         T previous;
 
-        public TestVisitor(AVLTree<T> tested, AVLTree.VisitingOrder order, OrderAssertion<T> orderAssertion){
+        public TestVisitor(AvlTree<T> tested, AvlTree.VisitingOrder order, OrderAssertion<T> orderAssertion){
             this.tested=tested;
             this.order=order;
             this.orderAssertion=orderAssertion;
@@ -116,7 +116,7 @@ class AVLTreeTest {
 
     @org.junit.jupiter.api.Test
     void inOrderVisit() {
-        new TestVisitor<>(test_tree, AVLTree.VisitingOrder.IN_ORDER,
+        new TestVisitor<>(test_tree, AvlTree.VisitingOrder.IN_ORDER,
             (Integer previous, Integer current)->
                 assertTrue(previous.compareTo(current)<=0)
         ).run();
@@ -124,7 +124,7 @@ class AVLTreeTest {
 
     @org.junit.jupiter.api.Test
     void preOrderVisit() {
-        new TestVisitor<>(test_tree, AVLTree.VisitingOrder.PRE_ORDER,
+        new TestVisitor<>(test_tree, AvlTree.VisitingOrder.PRE_ORDER,
                 // children should be visited after their parents
                 (Integer previous, Integer current)->
                         assertTrue(test_tree.elementDepth(previous)<=test_tree.elementDepth(current))
@@ -133,7 +133,7 @@ class AVLTreeTest {
 
     @org.junit.jupiter.api.Test
     void postOrderVisit() {
-        new TestVisitor<>(test_tree, AVLTree.VisitingOrder.POST_ORDER,
+        new TestVisitor<>(test_tree, AvlTree.VisitingOrder.POST_ORDER,
                 // children should be visited before their parents
                 (Integer previous, Integer current)->
                         assertTrue(test_tree.elementDepth(previous) >= test_tree.elementDepth(current))
@@ -145,7 +145,7 @@ class AVLTreeTest {
         int elementsRange=20;
         int count=100;
 
-        AVLTree<Integer> tree=new AVLTree<>();
+        AvlTree<Integer> tree=new AvlTree<>();
         Random random=new Random(123);
 
         for(int i=0; i<count; i++){
@@ -160,7 +160,7 @@ class AVLTreeTest {
                 tree.delete(element);
                 assertFalse(tree.contains(element));
             }
-            assertTrue(tree.isCorrectAVL());
+            assertTrue(tree.isAvlBalanced());
         }
     }
 }
