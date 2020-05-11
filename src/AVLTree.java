@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 class AVLTree<T extends Comparable<T>> {
 
     private class Node {
@@ -28,15 +30,14 @@ class AVLTree<T extends Comparable<T>> {
         }
     }
 
+    // a(0)=0, a(n)=a(n-1)*2+1 in iterative form
     public int spaces(int n){
         return (int)Math.pow(2, n)-1;
     }
 
     private String repeatCharacter(char character, int length){
         char[] array=new char[length];
-        for(int i=0; i<length; i++){
-            array[i]=character;
-        }
+        Arrays.fill(array, character);
         return new String(array);
     }
 
@@ -48,7 +49,7 @@ class AVLTree<T extends Comparable<T>> {
         }
     }
 
-    private void toStringRecursive(Node node, String[] lines, int depth){
+    private void graphRecursive(Node node, String[] lines, int depth){
         String space=repeatCharacter(' ', spaces(root.height-depth));
         if(lines[depth]==null){
             lines[depth]=space+graphRecursive(node);
@@ -56,14 +57,14 @@ class AVLTree<T extends Comparable<T>> {
             lines[depth]+=space+" "+space+graphRecursive(node);
         }
         if(node!=null) {
-            toStringRecursive(node.left, lines, depth + 1);
-            toStringRecursive(node.right, lines, depth + 1);
+            graphRecursive(node.left, lines, depth + 1);
+            graphRecursive(node.right, lines, depth + 1);
         }
     }
 
     public String graph() {
         String[] lines=new String[root.height+1];
-        toStringRecursive(root, lines, 0);
+        graphRecursive(root, lines, 0);
         return String.join("\n", lines);
     }
 
@@ -130,6 +131,32 @@ class AVLTree<T extends Comparable<T>> {
         return height(N.left) - height(N.right);
     }
 
+    private Node fixAfterInsertion(Node node, T key){
+        int balance = getBalance(node);
+
+        // left-left case
+        if (balance > 1 && key.compareTo(node.left.key)<0)
+            return rightRotate(node);
+
+        // right-right case
+        if (balance < -1 && key.compareTo(node.right.key)>0)
+            return leftRotate(node);
+
+        // left-right case
+        if (balance > 1 && key.compareTo(node.left.key)>0) {
+            node.left = leftRotate(node.left);
+            return rightRotate(node);
+        }
+
+        // right-left case
+        if (balance < -1 && key.compareTo(node.right.key)<0) {
+            node.right = rightRotate(node.right);
+            return leftRotate(node);
+        }
+
+        return node;
+    }
+
     private Node insert(Node node, T key) {
         if (node == null)
             return new Node(key);
@@ -146,37 +173,8 @@ class AVLTree<T extends Comparable<T>> {
             return newNode;
         }
 
-        /* 2. Update height of this ancestor node */
-        node.height = 1 + Math.max(height(node.left),
-                height(node.right));
-  
-        /* 3. Get the balance factor of this ancestor 
-              node to check whether this node became 
-              unbalanced */
-        int balance = getBalance(node);
-
-        // If this node becomes unbalanced, then there 
-        // are 4 cases Left Left Case 
-        if (balance > 1 && key.compareTo(node.left.key)<0)
-            return rightRotate(node);
-
-        // Right Right Case 
-        if (balance < -1 && key.compareTo(node.right.key)>0)
-            return leftRotate(node);
-
-        // Left Right Case 
-        if (balance > 1 && key.compareTo(node.left.key)>0) {
-            node.left = leftRotate(node.left);
-            return rightRotate(node);
-        }
-
-        // Right Left Case 
-        if (balance < -1 && key.compareTo(node.right.key)<0) {
-            node.right = rightRotate(node.right);
-            return leftRotate(node);
-        }
-
-        return node;
+        updateHeight(node);
+        return fixAfterInsertion(node, key);
     }
 
     public void insert(T element){
@@ -187,9 +185,10 @@ class AVLTree<T extends Comparable<T>> {
     {
         Node current = node;
 
-        /* loop down to find the leftmost leaf */
-        while (current.left != null)
+        // find element the furthest left element in the tree
+        while (current.left != null) {
             current = current.left;
+        }
 
         return current;
     }
@@ -202,9 +201,10 @@ class AVLTree<T extends Comparable<T>> {
     {
         Node current = node;
 
-        /* loop down to find the leftmost leaf */
-        while (current.right != null)
+        // find element the furthest right element in the tree
+        while (current.right != null) {
             current = current.right;
+        }
 
         return current;
     }
@@ -213,96 +213,81 @@ class AVLTree<T extends Comparable<T>> {
         return upperNode(root).key;
     }
 
-    private Node deleteNode(Node root, T key)
-    {
-        // STEP 1: PERFORM STANDARD BST DELETE
-        if (root == null)
-            return root;
+    private Node fixAfterDeletion(Node node){
+        int balance = getBalance(node);
 
-        // If the key to be deleted is smaller than
-        // the root's key, then it lies in left subtree
-        if (key.compareTo(root.key)<0)
-            root.left = deleteNode(root.left, key);
+        // left-left case
+        if (balance > 1 && getBalance(node.left) >= 0)
+            return rightRotate(node);
 
-            // If the key to be deleted is greater than the
-            // root's key, then it lies in right subtree
-        else if (key.compareTo(root.key)>0)
-            root.right = deleteNode(root.right, key);
-
-            // if key is same as root's key, then this is the node
-            // to be deleted
-        else
+        // left-right case
+        if (balance > 1 && getBalance(node.left) < 0)
         {
+            node.left = leftRotate(node.left);
+            return rightRotate(node);
+        }
 
+        // right-right case
+        if (balance < -1 && getBalance(node.right) <= 0) {
+            return leftRotate(node);
+        }
+
+        // right-left case
+        if (balance < -1 && getBalance(node.right) > 0)
+        {
+            node.right = rightRotate(node.right);
+            return leftRotate(node);
+        }
+
+        return node;
+    }
+
+    private Node deleteNode(Node node, T key)
+    {
+        if (node == null) {
+            return null;
+        }
+
+        if (key.compareTo(node.key)<0) {
+            // search left subtree
+            node.left = deleteNode(node.left, key);
+        } else if (key.compareTo(node.key)>0) {
+            // search right subtree
+            node.right = deleteNode(node.right, key);
+        } else {
             // node with only one child or no child
-            if ((root.left == null) || (root.right == null))
+            if ((node.left == null) || (node.right == null))
             {
                 Node temp = null;
-                if (temp == root.left)
-                    temp = root.right;
-                else
-                    temp = root.left;
+                if (node.left!=null) {
+                    temp = node.left;
+                } else {
+                    temp = node.right;
+                }
 
-                // No child case
+                // the node has no children
                 if (temp == null)
                 {
-                    temp = root;
-                    root = null;
+                    return null;
                 }
-                else // One child case
-                    root = temp; // Copy the contents of
-                // the non-empty child
+                else {
+                    // replace the node with its only child
+                    node = temp;
+                }
             }
             else
             {
-
-                // node with two children: Get the inorder
-                // successor (smallest in the right subtree)
-                Node temp = lowerNode(root.right);
-
-                // Copy the inorder successor's data to this node
-                root.key = temp.key;
-
-                // Delete the inorder successor
-                root.right = deleteNode(root.right, temp.key);
+                // get the lowest node in the right subtree
+                Node lowest = lowerNode(node.right);
+                // replace node value with the lowest value
+                node.key = lowest.key;
+                // delete the lowest in right subtree using this function recursively
+                node.right = deleteNode(node.right, lowest.key);
             }
         }
 
-        // If the tree had only one node then return
-        if (root == null)
-            return root;
-
-        // STEP 2: UPDATE HEIGHT OF THE CURRENT NODE
-        root.height = Math.max(height(root.left), height(root.right)) + 1;
-
-        // STEP 3: GET THE BALANCE FACTOR OF THIS NODE (to check whether
-        // this node became unbalanced)
-        int balance = getBalance(root);
-
-        // If this node becomes unbalanced, then there are 4 cases
-        // Left Left Case
-        if (balance > 1 && getBalance(root.left) >= 0)
-            return rightRotate(root);
-
-        // Left Right Case
-        if (balance > 1 && getBalance(root.left) < 0)
-        {
-            root.left = leftRotate(root.left);
-            return rightRotate(root);
-        }
-
-        // Right Right Case
-        if (balance < -1 && getBalance(root.right) <= 0)
-            return leftRotate(root);
-
-        // Right Left Case
-        if (balance < -1 && getBalance(root.right) > 0)
-        {
-            root.right = rightRotate(root.right);
-            return leftRotate(root);
-        }
-
-        return root;
+        updateHeight(node);
+        return fixAfterDeletion(node);
     }
 
     public void delete(T element) {

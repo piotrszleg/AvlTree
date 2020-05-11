@@ -1,5 +1,7 @@
 import javax.lang.model.element.Element;
 
+import java.util.Random;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class AVLTreeTest {
@@ -37,11 +39,30 @@ class AVLTreeTest {
     }
 
     @org.junit.jupiter.api.Test
+    void deleteAll(){
+        AVLTree<Integer> tree=new AVLTree<>(new Integer[]{4, 6});
+        tree.delete(4);
+        assertFalse(tree.contains(4));
+        tree.delete(6);
+        assertFalse(tree.contains(6));
+    }
+
+    @org.junit.jupiter.api.Test
     void doubleInsert(){
         AVLTree<Integer> tree=new AVLTree<>();
         tree.insert(5);
         tree.insert(5);
         assertTrue(tree.contains(5));
+        tree.delete(5);
+        assertFalse(tree.contains(5));
+    }
+
+    @org.junit.jupiter.api.Test
+    void doubleDelete(){
+        AVLTree<Integer> tree=new AVLTree<>();
+        tree.insert(5);
+        assertTrue(tree.contains(5));
+        tree.delete(5);
         tree.delete(5);
         assertFalse(tree.contains(5));
     }
@@ -91,18 +112,42 @@ class AVLTreeTest {
     }
 
     @org.junit.jupiter.api.Test
-    void postOrderVisit() {
-        new TestVisitor<Integer>(test_tree, AVLTree.VisitingOrder.POST_ORDER,
+    void preOrderVisit() {
+        new TestVisitor<Integer>(test_tree, AVLTree.VisitingOrder.PRE_ORDER,
+                // children should be visited after their parents
                 (Integer previous, Integer current)->
-                    assertTrue(test_tree.elementDepth(previous) >= test_tree.elementDepth(current))
+                        assertTrue(test_tree.elementDepth(previous)<=test_tree.elementDepth(current))
         ).run();
     }
 
     @org.junit.jupiter.api.Test
-    void preOrderVisit() {
-        new TestVisitor<Integer>(test_tree, AVLTree.VisitingOrder.PRE_ORDER,
+    void postOrderVisit() {
+        new TestVisitor<Integer>(test_tree, AVLTree.VisitingOrder.POST_ORDER,
+                // children should be visited before their parents
                 (Integer previous, Integer current)->
-                        assertTrue(test_tree.elementDepth(previous)<=test_tree.elementDepth(current))
+                        assertTrue(test_tree.elementDepth(previous) >= test_tree.elementDepth(current))
         ).run();
+    }
+
+    @org.junit.jupiter.api.Test
+    void bigDataset(){
+        int elementsRange=20;
+        int count=100;
+
+        AVLTree<Integer> tree=new AVLTree<>();
+        Random random=new Random(123);
+
+        for(int i=0; i<count; i++){
+            // 75% of actions should be insertions
+            boolean insertionOrDeletion=random.nextFloat()<0.75f;
+            Integer element=random.nextInt(elementsRange);
+            if(insertionOrDeletion){
+                tree.insert(element);
+                assertTrue(tree.contains(element));
+            } else {
+                tree.delete(element);
+                assertFalse(tree.contains(element));
+            }
+        }
     }
 }
