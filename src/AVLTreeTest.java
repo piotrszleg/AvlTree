@@ -1,5 +1,3 @@
-import javax.lang.model.element.Element;
-
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -71,10 +69,10 @@ class AVLTreeTest {
         void test(T previous, T current);
     }
 
-    class TestVisitor<T extends Comparable<T>> implements AVLTree.Visitor<T> {
-        AVLTree.VisitingOrder order;
-        OrderAssertion<T> orderAssertion;
-        AVLTree<T> tested;
+    static class TestVisitor<T extends Comparable<T>> implements AVLTree.Visitor<T> {
+        final AVLTree.VisitingOrder order;
+        final OrderAssertion<T> orderAssertion;
+        final AVLTree<T> tested;
 
         final AVLTree<T> visited=new AVLTree<>();
         boolean hasPrevious=false;
@@ -105,7 +103,7 @@ class AVLTreeTest {
 
     @org.junit.jupiter.api.Test
     void inOrderVisit() {
-        new TestVisitor<Integer>(test_tree, AVLTree.VisitingOrder.IN_ORDER,
+        new TestVisitor<>(test_tree, AVLTree.VisitingOrder.IN_ORDER,
             (Integer previous, Integer current)->
                 assertTrue(previous.compareTo(current)<=0)
         ).run();
@@ -113,7 +111,7 @@ class AVLTreeTest {
 
     @org.junit.jupiter.api.Test
     void preOrderVisit() {
-        new TestVisitor<Integer>(test_tree, AVLTree.VisitingOrder.PRE_ORDER,
+        new TestVisitor<>(test_tree, AVLTree.VisitingOrder.PRE_ORDER,
                 // children should be visited after their parents
                 (Integer previous, Integer current)->
                         assertTrue(test_tree.elementDepth(previous)<=test_tree.elementDepth(current))
@@ -122,7 +120,7 @@ class AVLTreeTest {
 
     @org.junit.jupiter.api.Test
     void postOrderVisit() {
-        new TestVisitor<Integer>(test_tree, AVLTree.VisitingOrder.POST_ORDER,
+        new TestVisitor<>(test_tree, AVLTree.VisitingOrder.POST_ORDER,
                 // children should be visited before their parents
                 (Integer previous, Integer current)->
                         assertTrue(test_tree.elementDepth(previous) >= test_tree.elementDepth(current))
@@ -138,7 +136,8 @@ class AVLTreeTest {
         Random random=new Random(123);
 
         for(int i=0; i<count; i++){
-            // 75% of actions should be insertions
+            // more actions (75% in this case) should be insertions
+            // so that it is more likely we first add an element and then delete it
             boolean insertionOrDeletion=random.nextFloat()<0.75f;
             Integer element=random.nextInt(elementsRange);
             if(insertionOrDeletion){

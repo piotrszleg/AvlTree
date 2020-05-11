@@ -258,7 +258,7 @@ class AVLTree<T extends Comparable<T>> {
             // node with only one child or no child
             if ((node.left == null) || (node.right == null))
             {
-                Node temp = null;
+                Node temp;
                 if (node.left!=null) {
                     temp = node.left;
                 } else {
