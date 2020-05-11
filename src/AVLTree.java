@@ -40,7 +40,7 @@ class AVLTree<T extends Comparable<T>> {
         return new String(array);
     }
 
-    private String nodeToString(Node node){
+    private String graphRecursive(Node node){
         if(node!=null){
             return node.key.toString();
         } else {
@@ -51,9 +51,9 @@ class AVLTree<T extends Comparable<T>> {
     private void toStringRecursive(Node node, String[] lines, int depth){
         String space=repeatCharacter(' ', spaces(root.height-depth));
         if(lines[depth]==null){
-            lines[depth]=space+nodeToString(node);
+            lines[depth]=space+graphRecursive(node);
         } else {
-            lines[depth]+=space+" "+space+nodeToString(node);
+            lines[depth]+=space+" "+space+graphRecursive(node);
         }
         if(node!=null) {
             toStringRecursive(node.left, lines, depth + 1);
@@ -61,11 +61,22 @@ class AVLTree<T extends Comparable<T>> {
         }
     }
 
-    @Override
-    public String toString() {
+    public String graph() {
         String[] lines=new String[root.height+1];
         toStringRecursive(root, lines, 0);
         return String.join("\n", lines);
+    }
+
+    int sizeRecursive(Node node){
+        if(node==null){
+            return 0;
+        } else {
+            return sizeRecursive(node.left)+sizeRecursive(node.right);
+        }
+    }
+
+    public int size(){
+        return sizeRecursive(root);
     }
 
     private int height(Node N) {
@@ -121,14 +132,19 @@ class AVLTree<T extends Comparable<T>> {
 
     private Node insert(Node node, T key) {
         if (node == null)
-            return (new Node(key));
+            return new Node(key);
 
         if (key.compareTo(node.key)<0)
             node.left = insert(node.left, key);
         else if (key.compareTo(node.key)>0)
             node.right = insert(node.right, key);
-        else // Duplicate keys not allowed 
-            throw new RuntimeException("Duplicate key");
+        else {
+            // Replace already existing node
+            Node newNode = new Node(key);
+            newNode.right=node.right;
+            newNode.left=node.left;
+            return newNode;
+        }
 
         /* 2. Update height of this ancestor node */
         node.height = 1 + Math.max(height(node.left),
@@ -306,6 +322,22 @@ class AVLTree<T extends Comparable<T>> {
 
     public boolean contains(T element){
         return containsRecursive(root, element);
+    }
+
+    int elementDepthRecursive(Node node, T element){
+        if(node==null){
+            return -1;
+        }
+        int onLeft=elementDepthRecursive(node.left, element);
+        if(onLeft!=-1){
+            return onLeft;
+        } else {
+            return elementDepthRecursive(node.right, element);
+        }
+    }
+
+    int elementDepth(T element){
+        return elementDepthRecursive(root, element);
     }
 
     private void inOrderRecursive(Node node, Visitor<T> visitor) {
